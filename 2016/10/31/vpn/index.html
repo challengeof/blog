@@ -1,0 +1,87 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="但行好事，莫问前程。"><title>vps（ubuntu）搭建vpn | 石頭剪刀b's Blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/3.0.3/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.5.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/2.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">vps（ubuntu）搭建vpn</h1><a id="logo" href="/.">石頭剪刀b's Blog</a><p class="description">但行好事，莫问前程。</p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a><a href="/about/about.html"><i class="fa fa-user"> 关于</i></a><a href="/atom.xml"><i class="fa fa-rss"> 订阅</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">vps（ubuntu）搭建vpn</h1><div class="post-meta">Oct 31, 2016<span> | </span><span class="category"><a href="/categories/杂文/">杂文</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><a data-thread-key="2016/10/31/vpn/" href="/2016/10/31/vpn/#comments" class="ds-thread-count"></a><div class="post-content"><p>买的<a href="http://www.vultr.com/?ref=6916407-3B" target="_blank" rel="external">vultr</a>vps一直只是用来做shadowsocks服务，因为自己日常就是google&amp;youtube，反正就是浏览器使用了，够用，然后命令<br>行或者某些特殊的软件，就用某梯的vpn了，可是就在前几天某梯奔掉了，不凑巧的是，正好我需要gulp安装sass，需要fq，手里也有vps，所以就搭建了个vpn。</p>
+<a id="more"></a>
+<h4 id="安装pptpd"><a href="#安装pptpd" class="headerlink" title="安装pptpd"></a>安装pptpd</h4><ul>
+<li><p><strong>安装pptpd</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ apt-get install pptpd</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>修改配置文件</strong></p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/pptpd.conf</span><br></pre></td></tr></table></figure>
+<p> 找到如下内容，去掉注释<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">localip 192.168.0.1           #VPN服务器的虚拟ip</span><br><span class="line">remoteip 192.168.0.201-245    #分配给VPN客户端的虚拟ip</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>##设置dns##</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/ppp/pptpd-options</span><br></pre></td></tr></table></figure>
+<p> 找到如下内容,修改为google的dns</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ms-dns 8.8.8.8 #google dns</span><br><span class="line">ms-dns 8.8.4.4 #google dns</span><br></pre></td></tr></table></figure>
+<ul>
+<li>##编辑用户配置文件来添加用户##</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/ppp/chap-secrets</span><br></pre></td></tr></table></figure>
+<p> 依次为：用户名，服务类型，密码，非配ip（*代表随机分配）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">user pptpd password *</span><br></pre></td></tr></table></figure>
+<ul>
+<li>##重启PPTPD服务##</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ /etc/init.d/pptpd restart</span><br></pre></td></tr></table></figure>
+<ul>
+<li>##配置网络和路由规则 设置ipv4转发##</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/sysctl.conf</span><br></pre></td></tr></table></figure>
+<p>去掉文件中这一行的注释：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net.ipv4.ip_forward=1</span><br></pre></td></tr></table></figure>
+<p>立即生效</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sysctl -p</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>##安装iptables##</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ apt-get install iptables</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>##设置iptables NAT转发##</p>
+<p>#注意这里eth0代表你的外网网卡，请用ifconfig查看</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j MASQUERADE</span><br></pre></td></tr></table></figure>
+<p>#如果上面的命令报错,那么可以尝试以下的命令，其中xxx.xxx.xxx.xxx代表你的VPS外网ip地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ iptables -t nat -A POSTROUTING -s 192.168.0.0/24 -o eth0 -j SNAT --to-source xxx.xxx.xxx.xxx</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>##保存规则##</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ iptables-save &gt;/etc/iptables-rules</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>##编辑网卡文件，使之加载网卡时自动加载规则##</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim /etc/network/interfaces</span><br></pre></td></tr></table></figure>
+<p>文件末尾加入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pre-up iptables-restore &lt;/etc/iptables-rules</span><br></pre></td></tr></table></figure>
+<ul>
+<li>##保存##</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ iptables-save &gt;/etc/iptables-rules</span><br></pre></td></tr></table></figure>
+<ul>
+<li>##设置MTU来确保过大的包不会被丢弃（这个可以不做）##</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ iptables -I FORWARD -s 192.168.0.0/24 -p tcp --syn -i ppp+ -j TCPMSS --set-mss 1300</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>##MAC连接问题##</p>
+<p>如果macos能够连接上vpn但是不能上外网，ip.cn 还是本地ip，在vpn高级里边勾选##通过VPN连接发送全部流量##，搞定。</p>
+<h4 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h4><p>vultr 是我用过的性价比最高的一款vps，因为有日本机房，所以速度非常快。如果你还在纠结是用什么样的vps，不妨试试vultr吧。点我<a href="http://www.vultr.com/?ref=6916407-3B" target="_blank" rel="external">vultr</a>注册可得20$<br>奖励，一个月5$,就可以用四个月哦。</p>
+<p>####参考 <a href="http://blog.kunyu.li/digitalocean-ubuntu-vps-vpn.html" target="_blank" rel="external">blog</a></p>
+</li>
+</ul>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="http://blog.dinggangchui.cn/2016/10/31/vpn/" data-id="ciuxmyx4p0000io73s8w97j2o" class="article-share-link">分享到</a><div class="tags"></div><div class="post-nav"><a href="/2016/08/12/Distributed-Transaction/" class="next">分布式事物</a></div><div data-thread-key="2016/10/31/vpn/" data-title="vps（ubuntu）搭建vpn" data-url="http://blog.dinggangchui.cn/2016/10/31/vpn/" class="ds-share flat"><div class="ds-share-inline"><ul class="ds-share-icons-16"><li data-toggle="ds-share-icons-more"><a href="javascript:void(0);" class="ds-more">分享到：</a></li><li><a href="javascript:void(0);" data-service="weibo" class="ds-weibo">微博</a></li><li><a href="javascript:void(0);" data-service="qzone" class="ds-qzone">QQ空间</a></li><li><a href="javascript:void(0);" data-service="qqt" class="ds-qqt">腾讯微博</a></li><li><a href="javascript:void(0);" data-service="wechat" class="ds-wechat">微信</a></li></ul><div class="ds-share-icons-more"></div></div></div><div data-thread-key="2016/10/31/vpn/" data-title="vps（ubuntu）搭建vpn" data-url="http://blog.dinggangchui.cn/2016/10/31/vpn/" data-author-key="1" class="ds-thread"></div></div></div></div><div class="pure-u-1-4"><div id="sidebar"><div class="widget"><input placeholder="Search" type="text" class="st-default-search-input"/></div><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/git/">git</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/java/">java</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/mysql/">mysql</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂文/">杂文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/杂的文/">杂的文</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/算法/">算法</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/java/" style="font-size: 15px;">java</a> <a href="/tags/随笔/" style="font-size: 15px;">随笔</a> <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/杂文/" style="font-size: 15px;">杂文</a> <a href="/tags/mysql/" style="font-size: 15px;">mysql</a> <a href="/tags/sort/" style="font-size: 15px;">sort</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最新文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2016/10/31/vpn/">vps（ubuntu）搭建vpn</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/12/Distributed-Transaction/">分布式事物</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/08/09/elk/">elasticsearch+logstash+kibana日志解决方案</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/11/maupassant/">说说我在使用Hexo主题maupassant碰到的那些坑</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/10/惆怅/">惆怅，过往</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/05/08/PhilosophicOrHere/">哲理，这里（Philosophic,Here）</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/04/java读取配置文件/">刚工作时写的代码片段-java</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/04/01/git常用命令/">Git常用命令</a></li><li class="post-list-item"><a class="post-list-link" href="/2016/03/25/transaction/">数据库事务Transaction</a></li><li class="post-list-item"><a class="post-list-link" href="/2015/08/25/bubbleSort/">冒泡排序（bubbleSort）</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="http://wangguodong577.github.io" title="王国栋's Blog" target="_blank">王国栋's Blog</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">© <a href="/." rel="nofollow">石頭剪刀b's Blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/2.1.5/jquery.fancybox.pack.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="/css/jquery.fancybox.css?v=0.0.0"><script>var duoshuoQuery = {short_name:'challenge'};
+(function() {
+    var ds = document.createElement('script');
+    ds.type = 'text/javascript';ds.async = true;
+    ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+    ds.charset = 'UTF-8';
+    (document.getElementsByTagName('head')[0]
+        || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+</script><script>(function(w,d,t,u,n,s,e){w['SwiftypeObject']=n;w[n]=w[n]||function(){
+(w[n].q=w[n].q||[]).push(arguments);};s=d.createElement(t);
+e=d.getElementsByTagName(t)[0];s.async=1;s.src=u;e.parentNode.insertBefore(s,e);
+})(window,document,'script','//s.swiftypecdn.com/install/v2/st.js','_st');
+
+_st('install','UKLakpTK_B8iysxEsr2b','2.0.0');
+</script><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
